@@ -1,3 +1,5 @@
+import Home from ".";
+
 export default function About() {
   return (
     <>
