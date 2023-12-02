@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { firestore } from "../lib/firebase";
+import { firestore } from "@/lib/firebase";
+import Link from 'next/link';
 
 const TARGET_COLLECTION_NAME = "posts";
 
@@ -28,8 +29,14 @@ export default function Home() {
     <div>
       {data.length > 0 ? (
         data.map((item, i) => (
-          <div key={i}>
-            <p>{item.userName}</p>
+          <Link
+          key={item.id}
+          href={{
+            pathname: `/post/${item.id}`,
+            query: { subject: item.subject, year: item.year } // クエリストリングを追加
+          }}
+          >
+          <p>{item.userName}</p>
             <p>{item.subject}</p>
             <p>{item.department}</p>
             <p>{item.grade}</p>
@@ -38,7 +45,7 @@ export default function Home() {
             {item.postTime && <p>{item.postTime.toDate().toString()}</p>}
             {item.images && <img src={item.images} alt="Uploaded" />}
             <button></button>
-          </div>
+          </Link>
         ))
       ) : (
         <p>Loading...</p>
