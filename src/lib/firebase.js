@@ -17,7 +17,7 @@ const firebaseConfig = {
 let firebaseApp;
 if (!getApps().length) {
   firebaseApp = initializeApp(firebaseConfig);
-}
+};
 
 // インスタンス取得
 const firestore = getFirestore(firebaseApp);
