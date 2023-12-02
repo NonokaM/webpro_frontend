@@ -1,6 +1,6 @@
-import { addDoc, collection, setDoc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { useState } from "react";
-
+import db, { firestore } from "@/lib/firebase";
 
 export default function Create() {
     const [image, setImage] = useState([]);
@@ -15,25 +15,23 @@ export default function Create() {
         setImage(image);
     };
 
-    const doCreate = () => {
+    const doCreate = async () => {
         if ( !image || !subject ) {
             setErrorMessage("必須の項目を入力してください");
             return;
-        }
+        };
 
-        // try {
-        //     await addDoc(collection(db, "posts"),{
-        //         images,
-        //         subject,
-        //         department,
-        //         grade,
-        //         year,
-        //         overviwd,
-        //         postTime: firebase.firestore.FieldValue.serverTimestamp(),
-        //     });           
-        // } catch (error) {
-        //     console.log(error);
-        // }
+        
+        await addDoc(collection(firestore, db, "posts"),{
+            images: image,
+            subject: subject,
+            department: department,
+            grade: grade,
+            year: year,
+            overviwd: overviw,
+            postTime: firebase.firestore.FieldValue.serverTimestamp(),
+        });           
+        router.push('/');
     }
 
     return (
