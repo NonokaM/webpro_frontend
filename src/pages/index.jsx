@@ -31,12 +31,12 @@ export default function Home() {
         data.map((item, i) => (
           <div key={i}>
             <p>{item.userName}</p>
-            {/* <p>{item.postTime}</p> */}
             <p>{item.subject}</p>
             <p>{item.department}</p>
             <p>{item.grade}</p>
             <p>{item.year}</p>
             <p>{item.overviw}</p>
+            {item.postTime && <p>{item.postTime.toDate().toString()}</p>}
             <button></button>
           </div> // 投稿を表示
         ))

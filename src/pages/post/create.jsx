@@ -1,7 +1,8 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { firestore } from "@/lib/firebase";
+import { useState } from "react";
+import { firebaseApp, firestore, storage } from "@/lib/firebase";
 import Router from "next/router";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 
 export default function Create() {
     const [image, setImage] = useState(null);
@@ -10,14 +11,18 @@ export default function Create() {
     const [grade, setGrade] = useState("");
     const [year, setYear] = useState();
     const [overviw, setOverviw] = useState("");
-    // const [timestamp, setTimestamp] = useState(new Date());
     const [errorMessage, setErrorMessage] = useState("");
+
     
+    // const firestorage = firebaseApp.storage();
+
     //画像の処理
-    // const handleImage = event => {
-    //     const image = event.target.files[0];
-    //     setImage(image);
-    // };
+    const handleImage = (e) => {
+        setImage(e.target.files[0]);
+
+        e.preventDefault();
+        console.log(image);
+    };
 
     const doCreate = async () => {
         if ( !subject ) {
@@ -25,45 +30,39 @@ export default function Create() {
             return;
         };
 
-        //画像の処理
-        // const changeImage = () => {
-        //     if (!e.target.files) return;
+        try {
+            const imageRef = ref(firestorage, image.name);
+            await uploadBytes(imageRef, image);
         
-        //     const imgObject = e.target.files[0];
-        //     setImage(window.URL.createObjectURL(imgObject))   
-        // };
+            const imageUrl = await getDownloadURL(imageRef);
 
-        await addDoc(collection(firestore, "posts"),{
-            images: image,
-            subject: subject,
-            department: department,
-            grade: grade,
-            year: year,
-            overviwd: overviw,
-            postTime: new Date(),
-        });
-        Router.push('/');
+            await addDoc(collection(firestore, "posts"),{
+                images: imageUrl,
+                subject: subject,
+                department: department,
+                grade: grade,
+                year: year,
+                overviwd: overviw,
+                postTime: serverTimestamp(),
+            });
+
+            Router.push('/');
+        } catch (err) {
+            console.log(err);
+            setErrorMessage("エラーが発生しました")
+        }
     };
-
-    // useEffect(() => {
-    //     const getCurrentTimestamp = () => {
-    //         const timestamp = new Date();
-    //         setTimestamp(timestamp);
-    //     };
-
-    //     getCurrentTimestamp();
-    // }, []);
 
     return (
         <div>
             <h1>過去問を投稿</h1>
             <form doCreate={doCreate}>
-                {/* <input
+                <input
                     type="file"
                     name="image"
                     placeholder="過去問をアップロード"
                     onChange={handleImage}
-                /> */}
+                />
 
                 <input
                     type="text"
