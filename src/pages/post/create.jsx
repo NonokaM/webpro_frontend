@@ -1,62 +1,66 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { firebaseApp, firestore, storage } from "@/lib/firebase";
+import { firestore, storage } from "@/lib/firebase";
 import Router from "next/router";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export default function Create() {
     const [image, setImage] = useState(null);
     const [subject, setSubject] = useState("");
     const [department, setDepartment] = useState("");
     const [grade, setGrade] = useState("");
-    const [year, setYear] = useState();
-    const [overviw, setOverviw] = useState("");
+    const [year, setYear] = useState(null);
+    const [overview, setOverview] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
 
-    
-    // const firestorage = firebaseApp.storage();
-
-    //画像の処理
     const handleImage = (e) => {
         setImage(e.target.files[0]);
-
-        e.preventDefault();
-        console.log(image);
     };
 
-    const doCreate = async () => {
-        if ( !subject ) {
+    const doCreate = async (e) => {
+        e.preventDefault();
+
+        if (!subject || !image) {
             setErrorMessage("必須の項目を入力してください");
             return;
-        };
+        }
 
         try {
-            const imageRef = ref(firestorage, image.name);
-            await uploadBytes(imageRef, image);
-        
-            const imageUrl = await getDownloadURL(imageRef);
-
-            await addDoc(collection(firestore, "posts"),{
-                images: imageUrl,
+            // Firestoreに先にデータを保存してドキュメントIDを取得
+            const docRef = doc(collection(firestore, "posts"));
+            const docData = {
                 subject: subject,
                 department: department,
                 grade: grade,
                 year: year,
-                overviwd: overviw,
+                overview: overview,
                 postTime: serverTimestamp(),
-            });
+                // imageUrlはまだ設定しない
+            };
+
+            await setDoc(docRef, docData);
+
+            // Storageに画像を保存し、URLを取得
+            const imageRef = ref(storage, `posts/${docRef.id}/${image.name}`);
+            await uploadBytes(imageRef, image);
+            const imageUrl = await getDownloadURL(imageRef);
+            setImageUrl(imageUrl);
+
+            // Firestoreのドキュメントを更新して、imageUrlを追加
+            await setDoc(docRef, { ...docData, images: imageUrl }, { merge: true });
 
             Router.push('/');
         } catch (err) {
             console.log(err);
-            setErrorMessage("エラーが発生しました")
+            setErrorMessage("エラーが発生しました");
         }
     };
 
     return (
         <div>
             <h1>過去問を投稿</h1>
-            <form doCreate={doCreate}>
+            <form onSubmit={doCreate}>
                 <input
                     type="file"
                     name="image"
@@ -96,21 +100,13 @@ export default function Create() {
                     type="text"
                     name="overview"
                     placeholder="概要"
-                    onChange={(e) => setOverviw(e.target.value)}
+                    onChange={(e) => setOverview(e.target.value)}
                 />
 
-                <button
-                    type="submit"
-                    onClick={(e)=>{
-                    e.preventDefault();
-                    doCreate();
-                    }}
-                >
-                投稿
-                </button>
-            </form>
+                <button type="submit">投稿</button>
+                </form>
             {errorMessage && <p>{errorMessage}</p>}
-            {/* <img src={imageUrl} alr="uploaded" /> */}
+            {imageUrl && <img src={imageUrl} alt="uploaded" />}
         </div>
     );
 }
