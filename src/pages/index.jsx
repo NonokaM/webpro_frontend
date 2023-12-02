@@ -6,6 +6,7 @@ const TARGET_COLLECTION_NAME = "posts";
 
 export default function Home() {
   const [data, setData] = useState([]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -23,8 +24,6 @@ export default function Home() {
     fetchData();
   }, []);
 
-  console.log(data);
-
   return (
     <div>
       {data.length > 0 ? (
@@ -37,8 +36,9 @@ export default function Home() {
             <p>{item.year}</p>
             <p>{item.overviw}</p>
             {item.postTime && <p>{item.postTime.toDate().toString()}</p>}
+            {item.images && <img src={item.images} alt="Uploaded" />}
             <button></button>
-          </div> // 投稿を表示
+          </div>
         ))
       ) : (
         <p>Loading...</p>
