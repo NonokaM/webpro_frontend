@@ -33,7 +33,8 @@ export default function Home() {
           key={item.id}
           href={{
             pathname: `/post/${item.id}`,
-            query: { subject: item.subject, year: item.year } // クエリストリングを追加
+            query: { subject: item.subject, department: item.department, grade: item.grade,
+              year: item.year, overviw: item.overviw, postTime: item.postTime, images: item.images}
           }}
           >
           <p>{item.userName}</p>
