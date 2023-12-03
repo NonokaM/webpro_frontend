@@ -10,9 +10,15 @@ const useGenerateQuestion = () => {
         console.log('API Response:', response.data);
 
         const { openai } = response.data;
-        const { question, answer } = openai[0];
+        if (!openai || openai.length === 0) {
+          console.log('No data found in response');
+          return { success: false };
+        }
 
-        setData({ questions: question[0], answers: answer[0] });
+        const questions = openai.map(item => item.question).flat();
+        const answers = openai.map(item => item.answer).flat();
+
+        setData({ questions, answers });
         return { success: true };
       } catch (err) {
         console.log(err);
