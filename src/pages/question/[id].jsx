@@ -1,20 +1,33 @@
 import { useRouter } from 'next/router';
+import useGenerateURL from '@/hooks/useGenerateURL';
 
-export default function Question() {
-  const router = useRouter();
-  const { id, subject, year } = router.query;
+export default function PostPage() {
+    const router = useRouter();
+    const { id } = router.query;
 
-  // クエリパラメータが存在するかを確認
-  if (router.isFallback || !router.isReady) {
-    return <p>Loading...</p>;
-  }
+    const filePath = `images/${id}.JPG`;
+    const { url, questionsData } = useGenerateURL(filePath);
 
-  return (
-    <div>
-      <h1>投稿詳細</h1>
-      <p>Question ID: {id}</p>
-      <p>Subject: {subject}</p>
-      <p>Year: {year}</p>
-    </div>
-  );
+    if (!url || !questionsData) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <div>
+            <p>About</p>
+            {url && <div>URL: {url}</div>}
+            {questionsData && (
+                <div>
+                    <h3>Questions</h3>
+                    {questionsData.questions.map((question, index) => (
+                        <p key={index}>{question}</p>
+                    ))}
+                    <h3>Answers</h3>
+                    {questionsData.answers.map((answer, index) => (
+                        <p key={index}>{answer}</p>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 }
