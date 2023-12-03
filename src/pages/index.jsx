@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { firestore } from "../lib/firebase";
+import { firestore } from "@/lib/firebase";
+import Link from 'next/link';
 
 const TARGET_COLLECTION_NAME = "posts";
 
 export default function Home() {
   const [data, setData] = useState([]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -23,22 +25,28 @@ export default function Home() {
     fetchData();
   }, []);
 
-  console.log(data);
-
   return (
     <div>
       {data.length > 0 ? (
         data.map((item, i) => (
-          <div key={i}>
-            <p>{item.userName}</p>
+          <Link
+          key={item.id}
+          href={{
+            pathname: `/post/${item.id}`,
+            query: { subject: item.subject, department: item.department, grade: item.grade,
+              year: item.year, overviw: item.overviw, postTime: item.postTime, images: item.images}
+          }}
+          >
+          <p>{item.userName}</p>
             <p>{item.subject}</p>
             <p>{item.department}</p>
             <p>{item.grade}</p>
             <p>{item.year}</p>
             <p>{item.overviw}</p>
             {item.postTime && <p>{item.postTime.toDate().toString()}</p>}
+            {item.images && <img src={item.images} alt="Uploaded" />}
             <button></button>
-          </div> // 投稿を表示
+          </Link>
         ))
       ) : (
         <p>Loading...</p>
