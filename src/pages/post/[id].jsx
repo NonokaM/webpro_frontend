@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import styles from '@/styles/id.module.css';
 
 export default function Post() {
   const router = useRouter();
@@ -16,16 +17,22 @@ export default function Post() {
 
   return (
     <div>
-      <h1>投稿詳細</h1>
-      <p>Question ID: {id}</p>
-      <p>Subject: {subject}</p>
-      <p>Year: {year}</p>
-      <p>{department}</p>
-      <p>{grade}</p>
-      {images && <img src={images} alt="Uploaded" />}
-      <button onClick={navigateToQuestionPage}>
-        AIで未来問をつくる
-      </button>
+      <div className={styles.big}>
+        <div className={styles.title}>
+          <p className={styles.kamoku}> {subject}</p>
+          <div className={styles.when}>
+            <p>{department}</p>
+            <div className={styles.line}>/</div>
+            <p>{grade}</p>
+            <div className={styles.line}>/</div>
+            <p>{year}</p>
+          </div>
+        </div>
+        {images && <img className={styles.img} src={images} alt="Uploaded" />}
+        <button className={styles.button} onClick={navigateToQuestionPage}>
+          未来問作成
+        </button>
+      </div>
     </div>
   );
 }
