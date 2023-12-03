@@ -18,7 +18,7 @@ export default function PostPage() {
                     const imageData = docSnap.data();
                     setImageUrl(imageData.images);
                 } else {
-                    console.log("No such document!");
+                    console.log("No such document");
                 }
             }).catch(error => {
                 console.error("Error getting document:", error);
