@@ -3,8 +3,9 @@ import { useState } from "react";
 import { firestore, storage } from "@/lib/firebase";
 import Router from "next/router";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import styles from '@/styles/create.module.css';
 
-export default function Create() {
+const Create = () => {
     const [image, setImage] = useState(null);
     const [subject, setSubject] = useState("");
     const [department, setDepartment] = useState("");
@@ -45,68 +46,69 @@ export default function Create() {
             const imageRef = ref(storage, `posts/${docRef.id}/${image.name}`);
             await uploadBytes(imageRef, image);
             const imageUrl = await getDownloadURL(imageRef);
-            setImageUrl(imageUrl);
 
             // Firestoreのドキュメントを更新して、imageUrlを追加
-            await setDoc(docRef, { ...docData, images: imageUrl }, { merge: true });
+            await setDoc(docRef, { ...docData, imageUrl: imageUrl }, { merge: true });
 
             Router.push('/');
         } catch (err) {
-            console.log(err);
+            console.error(err);
             setErrorMessage("エラーが発生しました");
         }
     };
 
     return (
-        <div>
-            <h1>過去問を投稿</h1>
+        <div className={styles.page}>
+            <h1 className={styles.titol}>過去問を投稿!</h1>
             <form onSubmit={doCreate}>
-                <input
+                <input className={styles.img_app}
                     type="file"
                     name="image"
                     placeholder="過去問をアップロード"
                     onChange={handleImage}
                 />
 
-                <input
+                <input className={styles.input_ln}
                     type="text"
                     name="subject"
                     placeholder="科目"
                     onChange={(e) => setSubject(e.target.value)}
                 />
 
-                <input
+                <input className={styles.input_ln}
                     type="text"
                     name="department"
                     placeholder="学科"
                     onChange={(e) => setDepartment(e.target.value)}
                 />
 
-                <input
+                <input className={styles.input_ln}
                     type="text"
                     name="grade"
                     placeholder="学年"
                     onChange={(e) => setGrade(e.target.value)}
                 />
 
-                <input
+                <input className={styles.input_ln}
                     type="text"
                     name="year"
                     placeholder="年度"
                     onChange={(e) => setYear(e.target.value)}
                 />
 
-                <input
+                <input className={styles.overview_ln}
                     type="text"
                     name="overview"
                     placeholder="概要"
                     onChange={(e) => setOverview(e.target.value)}
                 />
 
-                <button type="submit">投稿</button>
+                <button type="submit" className={styles.create_button}>投稿</button>
                 </form>
             {errorMessage && <p>{errorMessage}</p>}
             {imageUrl && <img src={imageUrl} alt="uploaded" />}
         </div>
     );
-}
+};
+
+export default Create;
