@@ -13,7 +13,7 @@ const Create = () => {
     const [year, setYear] = useState(null);
     const [overview, setOverview] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
+    const [images, setImages] = useState("");
 
     const handleImage = (e) => {
         setImage(e.target.files[0]);
@@ -37,7 +37,7 @@ const Create = () => {
                 year: year,
                 overview: overview,
                 postTime: serverTimestamp(),
-                // imageUrlはまだ設定しない
+                // imagesはまだ設定しない
             };
 
             await setDoc(docRef, docData);
@@ -45,10 +45,10 @@ const Create = () => {
             // Storageに画像を保存し、URLを取得
             const imageRef = ref(storage, `posts/${docRef.id}/${image.name}`);
             await uploadBytes(imageRef, image);
-            const imageUrl = await getDownloadURL(imageRef);
+            const images = await getDownloadURL(imageRef);
 
-            // Firestoreのドキュメントを更新して、imageUrlを追加
-            await setDoc(docRef, { ...docData, imageUrl: imageUrl }, { merge: true });
+            // Firestoreのドキュメントを更新して、imagesを追加
+            await setDoc(docRef, { ...docData, images: images }, { merge: true });
 
             Router.push('/');
         } catch (err) {
@@ -106,7 +106,7 @@ const Create = () => {
                 <button type="submit" className={styles.create_button}>投稿</button>
                 </form>
             {errorMessage && <p>{errorMessage}</p>}
-            {imageUrl && <img src={imageUrl} alt="uploaded" />}
+            {images && <img src={images} alt="uploaded" />}
         </div>
     );
 };
